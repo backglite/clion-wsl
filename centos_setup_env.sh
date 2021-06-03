@@ -3,12 +3,12 @@ set -e
 
 SSHD_LISTEN_ADDRESS=127.0.0.1
 
-SSHD_PORT=2223
+SSHD_PORT=${1:-2222}
 SSHD_FILE=/etc/ssh/sshd_config
 SUDOERS_FILE=/etc/sudoers
   
 # 0. update package lists
-sudo yum update
+sudo yum -y update
 
 # 0.1. reinstall sshd (workaround for initial version of WSL)
 #sudo yum erase -y openssh-server
@@ -46,6 +46,8 @@ sudo /usr/sbin/sshd
 sed -i '/^sudo \/usr\/sbin\/sshd/ d' ~/.bashrc
 #echo "%sudo ALL=(ALL) NOPASSWD: sudo /usr/sbin/sshd" | sudo tee -a $SUDOERS_FILE
 cat << 'EOF' >> ~/.bashrc
+
+#start sshd at the first login
 sshd_status=$(service sshd status)
 if [[ $sshd_status = *"is not running"* ]]; then
   sudo /usr/sbin/sshd
